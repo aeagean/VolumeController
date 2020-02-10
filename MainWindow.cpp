@@ -27,16 +27,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->horizontalSlider->setRange(0, 100);
+    ui->horizontalSlider_2->setRange(0, 100);
     m_volumeController = createVolumeController();
-    QTimer *timer = new QTimer;
-    connect(timer, &QTimer::timeout, [this](){
-        int value = m_volumeController->getMicVolume();
-        ui->horizontalSlider->setValue(value);
 
-        ui->horizontalSlider_2->setValue(m_volumeController->getSpeakerVolume());
-    });
+    connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdate()));
 
-    timer->start(500);
+    m_updateTimer.start(500);
+    //计划好看的slider样式
 }
 
 MainWindow::~MainWindow()
@@ -46,10 +44,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
-     qDebug() << "result: " << m_volumeController->setMicVolume(value);
+    qDebug() << "Set mic volume: " << value
+             << "; Result: " << m_volumeController->setMicVolume(value);
 }
 
 void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 {
-     qDebug() << "result: " << m_volumeController->setSpeakerVolume(value);
+    qDebug() << "Set speaker voluem: " << value
+             << "; Result: " << m_volumeController->setSpeakerVolume(value);
+}
+
+void MainWindow::onUpdate()
+{
+    int micVolume     = m_volumeController->getMicVolume();
+    int speakerVolume = m_volumeController->getSpeakerVolume();
+
+    ui->horizontalSlider->setValue(micVolume);
+    ui->horizontalSlider_2->setValue(speakerVolume);
+
+    ui->label_2->setText(QString::fromLocal8Bit("录音音量：(%1%)").arg(micVolume));
+    ui->label_3->setText(QString::fromLocal8Bit("扬声器音量：(%1%)").arg(speakerVolume));
 }
