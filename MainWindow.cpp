@@ -34,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdate()));
 
     m_updateTimer.start(500);
-    //计划好看的slider样式
 }
 
 MainWindow::~MainWindow()
